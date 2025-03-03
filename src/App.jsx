@@ -10,22 +10,20 @@ function Square({ value, onSquareClick }) {
     </button>
   );
 }
-export default function Board() {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [step, setStep] = useState(true);
 
+function Board({ step, squares, onPlay }) {
   const winner = calculateWinner(squares);
   let status;
 
   if (winner) {
     status = `Winner is: ${winner}`;
   } else {
-    status = `Next Player is: ${step? "X": "O"}`;
+    status = `Next Player is: ${step ? "X" : "O"}`;
   }
 
   function handleClick(i) {
     const nextSquares = squares.slice();
-    if (squares[i]) {
+    if (squares[i] || winner) {
       return;
     }
     if (step) {
@@ -33,11 +31,9 @@ export default function Board() {
     } else {
       nextSquares[i] = "O";
     }
-    setSquares(nextSquares);
-    setStep(!step);
+    onPlay(nextSquares);
   }
   return (
-    <div className="flex justify-between">
       <div>
         <div>
           <p>{status}</p>
@@ -58,6 +54,52 @@ export default function Board() {
           <Square onSquareClick={() => handleClick(7)} value={squares[7]} />
           <Square onSquareClick={() => handleClick(8)} value={squares[8]} />
         </div>
+      </div>
+  );
+}
+
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [step, setStep] = useState(true);
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquares = history[currentMove];
+
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setStep(!step);
+    setCurrentMove(nextHistory.length - 1);
+  }
+
+  function jumpTo(move) {
+    setCurrentMove(move);
+    setStep(move % 2 === 0);
+  }
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = `Go to the move #${move}`;
+    } else {
+      description = `Start the Game`;
+    }
+    return (
+      <li key={move}>
+        <button
+        className="bg-amber-500 p-1 rounded-2xl text-white font-bold cursor-pointer" 
+        onClick={() => jumpTo(move)}>
+          {description}
+          </button>
+      </li>
+    );
+  });
+  return (
+    <div className="w-2xl mx-auto flex  items-center gap-12 my-32">
+      <div>
+        <Board step={step} squares={currentSquares} onPlay={handlePlay} />
+      </div>
+      <div>
+        <ol className="space-y-1.5">{moves}</ol>
       </div>
     </div>
   );
