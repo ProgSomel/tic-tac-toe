@@ -11,14 +11,18 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-function Board({ step, squares, onPlay }) {
+function Board({ step, squares, onPlay, move }) {
   const winner = calculateWinner(squares);
   let status;
 
   if (winner) {
     status = `Winner is: ${winner}`;
   } else {
-    status = `Next Player is: ${step ? "X" : "O"}`;
+    if (move >= 9) {
+      status = `No winner`;
+    } else {
+      status = `Next Player is: ${step ? "X" : "O"}`;
+    }
   }
 
   function handleClick(i) {
@@ -34,27 +38,27 @@ function Board({ step, squares, onPlay }) {
     onPlay(nextSquares);
   }
   return (
+    <div>
       <div>
-        <div>
-          <p>{status}</p>
-        </div>
-        <div className="flex">
-          <Square onSquareClick={() => handleClick(0)} value={squares[0]} />
-          <Square onSquareClick={() => handleClick(1)} value={squares[1]} />
-          <Square onSquareClick={() => handleClick(2)} value={squares[2]} />
-        </div>
-
-        <div className="flex">
-          <Square onSquareClick={() => handleClick(3)} value={squares[3]} />
-          <Square onSquareClick={() => handleClick(4)} value={squares[4]} />
-          <Square onSquareClick={() => handleClick(5)} value={squares[5]} />
-        </div>
-        <div className="flex">
-          <Square onSquareClick={() => handleClick(6)} value={squares[6]} />
-          <Square onSquareClick={() => handleClick(7)} value={squares[7]} />
-          <Square onSquareClick={() => handleClick(8)} value={squares[8]} />
-        </div>
+        <p>{status}</p>
       </div>
+      <div className="flex">
+        <Square onSquareClick={() => handleClick(0)} value={squares[0]} />
+        <Square onSquareClick={() => handleClick(1)} value={squares[1]} />
+        <Square onSquareClick={() => handleClick(2)} value={squares[2]} />
+      </div>
+
+      <div className="flex">
+        <Square onSquareClick={() => handleClick(3)} value={squares[3]} />
+        <Square onSquareClick={() => handleClick(4)} value={squares[4]} />
+        <Square onSquareClick={() => handleClick(5)} value={squares[5]} />
+      </div>
+      <div className="flex">
+        <Square onSquareClick={() => handleClick(6)} value={squares[6]} />
+        <Square onSquareClick={() => handleClick(7)} value={squares[7]} />
+        <Square onSquareClick={() => handleClick(8)} value={squares[8]} />
+      </div>
+    </div>
   );
 }
 
@@ -86,17 +90,23 @@ export default function Game() {
     return (
       <li key={move}>
         <button
-        className="bg-amber-500 p-1 rounded-2xl text-white font-bold cursor-pointer" 
-        onClick={() => jumpTo(move)}>
+          className="bg-amber-500 p-1 rounded-2xl text-white font-bold cursor-pointer"
+          onClick={() => jumpTo(move)}
+        >
           {description}
-          </button>
+        </button>
       </li>
     );
   });
   return (
     <div className="w-2xl mx-auto flex  items-center gap-12 my-32">
       <div>
-        <Board step={step} squares={currentSquares} onPlay={handlePlay} />
+        <Board
+          step={step}
+          squares={currentSquares}
+          onPlay={handlePlay}
+          move={currentMove}
+        />
       </div>
       <div>
         <ol className="space-y-1.5">{moves}</ol>
